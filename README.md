@@ -1,4 +1,12 @@
-# pokevue
+# PokeVue
+
+A pokedex app built upon
+
+- VueJS
+- PokeAPI
+- Vue Router
+- Vuex
+- Axios
 
 ## Project setup
 ```
