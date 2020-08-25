@@ -16,10 +16,13 @@ export default new Vuex.Store({
       const { property, value } = payload;
       state[property] = value;
     },
+    updatePokemons(state, pokemons) {
+      state.pokemons = [...state.pokemons, ...pokemons];
+    }
   },
   actions: {
-    async loadPokemons({ commit }, url) {
-      const response = await axios.get(url);
+    async loadPokemons({ commit }, offset) {
+      const response = await axios.get(`https://pokeapi.co/api/v2/pokemon?offset=${offset}&limit=20`);
       /* 
       With the first response we only get pokemon's name and an url 
       In order to get more informations about the pokemon we'll use the url to send an other request to the API and we'll do it for each pokemons of response.data.results array
@@ -27,10 +30,11 @@ export default new Vuex.Store({
       const allPokemons = await Promise.all(response.data.results.map(pokemon => axios.get(pokemon.url)));
 
       // Update pokemons array in the state with the new array
-      commit('mutate', {property: 'pokemons', value: allPokemons});
+      commit('updatePokemons', allPokemons);
+
       // hide loader
       commit('mutate', {property: 'loading', value: false});
-    }
+    },
   },
   modules: {
   }

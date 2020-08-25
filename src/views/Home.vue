@@ -8,6 +8,9 @@
       <b-card-group v-for="pokemon in pokemons" :key="pokemon.data.id">
         <pokemon :pokemon="pokemon.data" />
       </b-card-group>
+
+      <Observer @intersect="loadMore" />
+
     </div>
   </div>
 </template>
@@ -15,18 +18,33 @@
 <script>
 import Pokemon from '@/components/Home/Pokemon'
 import Loader from '@/components/Loader'
+import Observer from '@/components/Observer'
 import { mapState } from 'vuex'
 
 export default {
   name: 'Home',
-  components: { Pokemon, Loader },
+  components: { Pokemon, Loader, Observer },
+  data() {
+    return {
+      // offset used to display pokemons
+      offset: 0,
+    }
+  },
   computed: mapState([
     'pokemons',
     'loading'
   ]),
+  methods: {
+    loadMore() {
+      // Load the 20 next pokemons whenever we reach bottom of the screen
+      this.offset += 20;
+      this.$store.dispatch('loadPokemons', this.offset);
+    },
+  },
   created() {
-    this.$store.dispatch('loadPokemons', 'https://pokeapi.co/api/v2/pokemon');
-  }
+    // Load the 20 first pokemons
+    this.$store.dispatch('loadPokemons', this.offset);
+  },
 }
 </script>
 
