@@ -8,8 +8,14 @@ export default new Vuex.Store({
   state: {
     // All pokemons List 
     pokemons: [],
+    // One pokemon data
+    pokemon: [],
     // Defines whether to display or not loader
-    loading: true
+    loading: true,
+    // Value of search pokemon input
+    searchPokemon: '',
+    // Defines whether to display or not error message
+    error: false,
   },
   mutations: {
     mutate(state, payload) {
@@ -35,6 +41,25 @@ export default new Vuex.Store({
       // hide loader
       commit('mutate', {property: 'loading', value: false});
     },
+    async loadSinglePokemon({ commit }, pokemon) {
+      // Reset loading and error value
+      commit('mutate', {property: 'loading', value: true});
+      commit('mutate', {property: 'error', value: false});
+      
+      try {
+        const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon}`);
+        // Save pokemon in the state
+        commit('mutate', {property: 'pokemon', value: response.data});      
+        // Empty input value
+        commit('mutate', {property: 'searchPokemon', value: ''});
+      }
+      catch {
+        // Set error to true to display error message
+        commit('mutate', {property: 'error', value: true});      
+      }
+      // Hide Loader
+      commit('mutate', {property: 'loading', value: false});
+    }
   },
   modules: {
   }
