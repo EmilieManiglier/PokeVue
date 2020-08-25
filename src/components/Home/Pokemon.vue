@@ -5,6 +5,7 @@
     :img-alt="pokemon.name"
     tag="article"
     class="p-2 m-2 text-center rounded"
+    @click="singlePokemon(pokemon.id)"
   >
     <img src="@/assets/pokeball.png" alt="" class="pokeball" />
     <b-card-text  v-for="type in pokemon.types" :key="type.slot" :class="type.type.name">
@@ -24,6 +25,12 @@ export default {
     },
     pokemonId() {
       return formatId(this.pokemon.id)
+    }
+  },
+  methods: {
+    singlePokemon(id) {
+      // Send to the pokemon's detail page
+      this.$router.push(`/pokemon/${id}`);
     }
   }
 };
