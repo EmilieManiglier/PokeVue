@@ -8,6 +8,8 @@ export default new Vuex.Store({
   state: {
     // All pokemons List 
     pokemons: [],
+    // Defines whether to display or not loader
+    loading: true
   },
   mutations: {
     mutate(state, payload) {
@@ -26,6 +28,8 @@ export default new Vuex.Store({
 
       // Update pokemons array in the state with the new array
       commit('mutate', {property: 'pokemons', value: allPokemons});
+      // hide loader
+      commit('mutate', {property: 'loading', value: false});
     }
   },
   modules: {
