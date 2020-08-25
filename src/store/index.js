@@ -16,11 +16,30 @@ export default new Vuex.Store({
     searchPokemon: '',
     // Defines whether to display or not error message
     error: false,
+    // pokemon first's type
+    firstType: '',
+    // pokemon' description
+    description: '',
+    // pokemon abilities (hidden or not)
+    abilities: [],
+    // pokemon about data
+    about: {},
+    // pokemon training data
+    training: {}
+  },
+  getters: {
+    getFirstType(state) {
+      const findType = state.pokemon.types.find(type => type.slot === 1);
+      return findType.type.name;
+    }
   },
   mutations: {
     mutate(state, payload) {
       const { property, value } = payload;
       state[property] = value;
+    },
+    updateAbout(state, about) {
+      state.about = {...state.about, ...about}
     },
     updatePokemons(state, pokemons) {
       state.pokemons = [...state.pokemons, ...pokemons];
@@ -41,7 +60,7 @@ export default new Vuex.Store({
       // hide loader
       commit('mutate', {property: 'loading', value: false});
     },
-    async loadSinglePokemon({ commit }, pokemon) {
+    async loadSinglePokemon({ commit, getters }, pokemon) {
       // Reset loading and error value
       commit('mutate', {property: 'loading', value: true});
       commit('mutate', {property: 'error', value: false});
@@ -52,6 +71,20 @@ export default new Vuex.Store({
         commit('mutate', {property: 'pokemon', value: response.data});      
         // Empty input value
         commit('mutate', {property: 'searchPokemon', value: ''});
+        // Get Pokemon first type
+        commit('mutate', {property: 'firstType', value: getters.getFirstType});
+        // Save abilities in the state
+        commit('mutate', {property: 'abilities', value: response.data.abilities});
+
+        const about = {
+          'Species': '',
+          // Convert height (dm) in meters
+          'Height': `${response.data.height/ 10} m`,
+          // Convert weight (hg) in kg with 1 digit after comma
+          'Weight': `${(response.data.weight * 0.1).toFixed(1)} kg`,
+        };
+        // Update about object in state with the data
+        commit('updateAbout', about);
       }
       catch {
         // Set error to true to display error message
@@ -59,6 +92,36 @@ export default new Vuex.Store({
       }
       // Hide Loader
       commit('mutate', {property: 'loading', value: false});
+    },
+    async loadAbout({ commit }, pokemonId) {
+      try {
+        const response = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`);
+
+        // Get pokemon species name in english
+        const speciesName = response.data.genera.find(element => element.language.name === 'en').genus;
+        // Update about object in state with the species
+        commit('updateAbout', {'Species' : speciesName});
+
+        // get all description in english
+        const descriptionEnglish = response.data.flavor_text_entries.filter(element => 
+          element.language.name === 'en');
+        // Get the english description coming from the latest version
+        const description = descriptionEnglish[descriptionEnglish.length - 1].flavor_text;
+        // Update description in the state
+        commit('mutate', {property: 'description', value: description});
+
+        const training = {
+          "Capture rate": response.data.capture_rate,
+          "Base Happiness": response.data.base_happiness,
+          "Growth rate": response.data.growth_rate.name
+        };
+        // Update training in the state with th data
+        commit('mutate', {property: 'training', value: training});
+
+      }
+      catch(error) {
+        console.log(error);
+      }
     }
   },
   modules: {

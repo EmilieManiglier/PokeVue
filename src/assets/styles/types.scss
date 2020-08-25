@@ -1,5 +1,7 @@
+@use 'sass:color';
+
 .bug {background-color: #A8B820;}
-.dark {background-color: #705848;}
+.dark {background-color: #49392F;}
 .dragon {background-color: #7038F8;}
 .electric {background-color: #F8D030;}
 .fairy {background-color: #EE99AC;}
@@ -16,3 +18,22 @@
 .rock {background-color: #B8A038;}
 .steel {background-color: #B8B8D0;}
 .water {background-color: #6890F0;}
+
+.bug-light {background-color: color.scale(#A8B820, $lightness: 40%);}
+.dark-light {background-color: color.scale(#49392F, $lightness: 40%);}
+.dragon-light {background-color: color.scale(#7038F8, $lightness: 40%);}
+.electric-light {background-color: color.scale(#F8D030, $lightness: 40%);}
+.fairy-light {background-color: color.scale(#EE99AC, $lightness: 40%);}
+.fighting-light {background-color: color.scale(#C03028, $lightness: 40%);}
+.fire-light {background-color: color.scale(#F08030, $lightness: 40%);}
+.flying-light {background-color: color.scale(#A890F0, $lightness: 40%);}
+.ghost-light {background-color: color.scale(#705898, $lightness: 40%);}
+.grass-light {background-color: color.scale(#78C850, $lightness: 40%);}
+.ground-light {background-color: color.scale(#E0C068, $lightness: 40%);}
+.ice-light {background-color: color.scale(#98D8D8, $lightness: 40%);}
+.normal-light {background-color: color.scale(#A8A878, $lightness: 40%);}
+.poison-light {background-color: color.scale(#A040A0, $lightness: 40%);}
+.psychic-light {background-color: color.scale(#F85888, $lightness: 40%);}
+.rock-light {background-color: color.scale(#B8A038, $lightness: 40%);}
+.steel-light {background-color: color.scale(#B8B8D0, $lightness: 40%);}
+.water-light {background-color: color.scale(#6890F0, $lightness: 40%);}
