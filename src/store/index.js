@@ -16,6 +16,7 @@ export default new Vuex.Store({
     searchPokemon: '',
     // Defines whether to display or not error message
     error: false,
+    // Defines whether a pokemon type has been searched or not
     searchType: false,
     // pokemon first's type
     firstType: '',
@@ -33,6 +34,8 @@ export default new Vuex.Store({
     evolutions: {},
     // Pokemon name and id used to get pokemon's image 
     pokemonIds: [],
+    // locations datas
+    locations: []
   },
   getters: {
     getFirstType(state) {
@@ -53,6 +56,9 @@ export default new Vuex.Store({
     },
     updateId(state, id) {
       state.pokemonIds = [...state.pokemonIds, id]
+    },
+    updateLocations(state, location) {
+      state.locations = [...state.locations, ...location]
     }
   },
   actions: {
@@ -183,7 +189,6 @@ export default new Vuex.Store({
           }
           commit('updateId', pokemonId);
         })
-
       }
       catch(error) {
         console.log(error);
@@ -212,6 +217,26 @@ export default new Vuex.Store({
         commit('mutate', {property: 'error', value: true});
       }
       // Hide loader
+      commit('mutate', {property: 'loading', value: false});
+    },
+    async loadLocations({ commit }) {
+      try {
+        // Send request to get location-area datas
+        const response = await axios.get('https://pokeapi.co/api/v2/location-area?offset=0&limit=20');
+        const allLocations = await Promise.all(response.data.results.map(location => axios.get(location.url)));
+
+        allLocations.map(currentLocation => {
+          // For each location, check if location already exist in the array
+          if(!this.state.locations.some(location => location.data.id === currentLocation.data.id)) {
+            // If not, Update locations array in the state with the new array
+            // This prevents for loop key duplicate error during render
+            commit('updateLocations', allLocations);
+          }
+        })
+      }
+      catch(error) {
+        console.log(error);
+      }
       commit('mutate', {property: 'loading', value: false});
     }
   },
