@@ -63,9 +63,15 @@ export default new Vuex.Store({
       In order to get more informations about the pokemon we'll use the url to send an other request to the API and we'll do it for each pokemons of response.data.results array
       */
       const allPokemons = await Promise.all(response.data.results.map(pokemon => axios.get(pokemon.url)));
-
       // Update pokemons array in the state with the new array
-      commit('updatePokemons', allPokemons);
+      allPokemons.map(pokemon => {
+        // Check if pokemon already exist in the array
+        if(!this.state.pokemons.some(poke => poke.data.id === pokemon.data.id)) {
+          // If not, Update pokemons array in the state with the new array
+          // This prevents for loop key duplicate error during render
+          commit('updatePokemons', allPokemons);
+        }
+      })
 
       // hide loader
       commit('mutate', {property: 'loading', value: false});

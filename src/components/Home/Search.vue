@@ -26,7 +26,7 @@ export default {
   computed: {
     disable() {
       // Disable button if input is empty
-      if(this.searchPokemon === '') return true;
+      if(this.searchPokemon === '') return true; 
       return false;
     },
     searchPokemon: {
