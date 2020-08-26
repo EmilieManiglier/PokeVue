@@ -65,7 +65,7 @@ export default {
     }    
   }, 
   created() {
-    this.$store.dispatch('loadAbout', this.id)
+    // this.$store.dispatch('loadAbout', this.id)
   }
 };
 </script>

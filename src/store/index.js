@@ -26,8 +26,12 @@ export default new Vuex.Store({
     about: {},
     // pokemon training data
     training: {},
-    // pokemons stats
-    stats: []
+    // pokemon stats
+    stats: [],
+    // pokemon evolution chain
+    evolutions: {},
+    // Pokemon name and id used to get pokemon's image 
+    pokemonIds: [],
   },
   getters: {
     getFirstType(state) {
@@ -45,6 +49,9 @@ export default new Vuex.Store({
     },
     updatePokemons(state, pokemons) {
       state.pokemons = [...state.pokemons, ...pokemons];
+    },
+    updateId(state, id) {
+      state.pokemonIds = [...state.pokemonIds, id]
     }
   },
   actions: {
@@ -99,7 +106,7 @@ export default new Vuex.Store({
       // Hide Loader
       commit('mutate', {property: 'loading', value: false});
     },
-    async loadAbout({ commit }, pokemonId) {
+    async loadAbout({ commit, dispatch }, pokemonId) {
       try {
         const response = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`);
 
@@ -124,10 +131,58 @@ export default new Vuex.Store({
         // Update training in the state with th data
         commit('mutate', {property: 'training', value: training});
 
+        dispatch('loadEvolutions', response.data.evolution_chain.url);
       }
       catch(error) {
         console.log(error);
       }
+    },
+    async loadEvolutions({ commit }, url) {
+      try {
+        // Send request to get pokemon's evolution chain
+        const response = await axios.get(url);
+        
+        // update evolutions in the state with response
+        commit('mutate', {property: 'evolutions', value: response.data.chain});     
+
+        // Push pokemon's name into evolutionsName
+        const evolutionsName = [];
+        evolutionsName.push(response.data.chain.species.name);
+
+        // If pokemon can evolve, push the evolution'name into evolutionsName array
+        if(response.data.chain.evolves_to.length > 0) {
+          response.data.chain.evolves_to.forEach(evolution => {
+            evolutionsName.push(evolution.species.name)
+          
+            // If pokemon can evolve again, push the evolution'name into evolutionsName array
+            if(evolution.evolves_to.length > 0) {
+              evolutionsName.push(evolution.evolves_to[0].species.name)
+            }
+          });
+
+          // If pokemon has an other evolution, push the evolution'name into evolutionsName array
+          if(response.data.chain.evolves_to[0].evolves_to.length > 0) {
+            response.data.chain.evolves_to[0].evolves_to.forEach(evolution => evolutionsName.push(evolution.species.name))
+          }
+        }   
+
+        // For each name in evolutionsName, send request to get pokemon information
+        const allEvolutions = await Promise.all(evolutionsName.map(pokemon => axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon}`)));
+        // For each response, push an object inside pokemonIds in the state
+        allEvolutions.forEach(pokemon => {
+          const pokemonId = {
+            id: pokemon.data.id,
+            name: pokemon.data.name
+          }
+          commit('updateId', pokemonId);
+        })
+
+      }
+      catch(error) {
+        console.log(error);
+      }
+      // Hide loader
+      commit('mutate', {property: 'loading', value: false});
     }
   },
   modules: {

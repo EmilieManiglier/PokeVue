@@ -35,6 +35,7 @@
         
         <about v-if="menu.about" :id="this.id" />
         <stats v-if="menu.stats" :id="this.id" />
+        <evolution v-if="menu.evolution" :name="pokemon.name" />
 
       </b-card-body>
     </b-card>
@@ -47,12 +48,13 @@ import { capitalString, formatId } from '@/utils/functions.js'
 import { mapState } from 'vuex'
 import About from '@/components/PokemonDetail/About'
 import Stats from '@/components/PokemonDetail/Stats'
+import Evolution from '@/components/PokemonDetail/Evolution'
 import Loader from '@/components/Loader'
 
 export default {
   name: 'pokemonDetail',
   props: ['id'],
-  components: { Loader, About, Stats },
+  components: { Loader, About, Stats, Evolution },
   data() {
     return {
       menu: {
@@ -83,6 +85,7 @@ export default {
   },
   created() {
     this.$store.dispatch('loadSinglePokemon', this.id);
+    this.$store.dispatch('loadAbout', this.id)
   }
 };
 </script>
