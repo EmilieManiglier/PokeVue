@@ -34,6 +34,8 @@
           </div>
         
         <about v-if="menu.about" :id="this.id" />
+        <stats v-if="menu.stats" :id="this.id" />
+
       </b-card-body>
     </b-card>
   </div>
@@ -44,19 +46,20 @@
 import { capitalString, formatId } from '@/utils/functions.js'
 import { mapState } from 'vuex'
 import About from '@/components/PokemonDetail/About'
+import Stats from '@/components/PokemonDetail/Stats'
 import Loader from '@/components/Loader'
 
 export default {
   name: 'pokemonDetail',
   props: ['id'],
-  components: { Loader, About },
+  components: { Loader, About, Stats },
   data() {
     return {
       menu: {
         about: true,
         stats: false,
         evolution: false,
-      },
+      }
     }
   },
   computed: {

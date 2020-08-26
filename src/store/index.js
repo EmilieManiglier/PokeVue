@@ -25,7 +25,9 @@ export default new Vuex.Store({
     // pokemon about data
     about: {},
     // pokemon training data
-    training: {}
+    training: {},
+    // pokemons stats
+    stats: []
   },
   getters: {
     getFirstType(state) {
@@ -85,6 +87,10 @@ export default new Vuex.Store({
         };
         // Update about object in state with the data
         commit('updateAbout', about);
+
+        // Get pokemon's base stat and update state with the datas
+        const stats = response.data.stats.map(stat => stat.base_stat);
+        commit('mutate', {property: 'stats', value: stats});
       }
       catch {
         // Set error to true to display error message
