@@ -19,7 +19,7 @@
 
       <b-collapse id="nav-text-collapse" is-nav>
         <b-navbar-nav>
-          <b-nav-item to="/routes">Localisation</b-nav-item>
+          <b-nav-item to="/location">Locations</b-nav-item>
           <b-nav-item to="/types" disabled>Types</b-nav-item>
           <b-nav-item to="" disabled>Items</b-nav-item>
         </b-navbar-nav>

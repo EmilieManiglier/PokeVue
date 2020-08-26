@@ -70,11 +70,11 @@ export default {
   ]),
   methods: {
     loadMore() {
-      /* Stops infinite scroll if offset is above 800 
+      /* Stops infinite scroll if offset is above 780 
       because there is no datas for pokemon last generation in the pokeAPI
       */
-      if(this.offset <= 800) {
-        // If offset is under or equal to 800
+      if(this.offset <= 780) {
+        // If offset is under to 780
         // Increment offset by 20
         this.offset += 20;        
         // Load the 20 next pokemons whenever we reach bottom of the screen

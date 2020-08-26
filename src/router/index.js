@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '@/views/Home.vue'
-import PokemonDetail from '@/views/PokemonDetail.vue'
 
 Vue.use(VueRouter)
 
@@ -13,9 +12,14 @@ Vue.use(VueRouter)
   },
   {
     path: '/pokemon/:id',
-    name: 'PokemonDetail',
+    name: 'pokemonDetail',
     props: true,
-    component: PokemonDetail
+    component: () => import('@/views/PokemonDetail.vue')
+  },  
+  {
+    path: '/location',
+    name: 'location',
+    component: () => import('@/views/Location.vue')
   }
 ]
 
