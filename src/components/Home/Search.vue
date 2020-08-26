@@ -3,7 +3,7 @@
     <b-form-input
       size="md"
       class="my-2 mx-md-2"
-      placeholder="Search Pokemon..."
+      placeholder="Try Pikachu, 25 or electric"
       v-model.trim="searchPokemon" 
     >
     </b-form-input>
@@ -40,12 +40,25 @@ export default {
       }
     }
   },
+  data() {
+    return {
+      types: ['bug', 'dark', 'dragon', 'electric', 'fairy', 'fighting', 'fire', 'flying', 'ghost', 'grass', 'ground', 'ice', 'normal', 'poison', 'psychic', 'rock', 'steel', 'water']
+    }
+  },
   methods: {
     handleSubmit() {
       // Get pokemon data according to input value
-      this.$store.dispatch('loadSinglePokemon', this.searchPokemon);
-      // Empty pokemons array in the state in order to display only the result of the research
-      this.$store.commit('mutate', {property: 'pokemons', value: []});
+      // if input value correspond to a pokemon type
+      if(this.types.indexOf(this.searchPokemon) > -1) {
+        // Send the request to get all pokemons of this type
+        this.$store.dispatch('loadTypes', this.searchPokemon);
+      }
+      else {
+        // Else, send the request to get one pokemon by name or id
+        this.$store.dispatch('loadSinglePokemon', this.searchPokemon);
+        // Empty pokemons array in the state in order to display only the result of the research
+        this.$store.commit('mutate', {property: 'pokemons', value: []});     
+      }
     }
   }
 };

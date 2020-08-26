@@ -16,6 +16,7 @@ export default new Vuex.Store({
     searchPokemon: '',
     // Defines whether to display or not error message
     error: false,
+    searchType: false,
     // pokemon first's type
     firstType: '',
     // pokemon' description
@@ -180,6 +181,29 @@ export default new Vuex.Store({
       }
       catch(error) {
         console.log(error);
+      }
+      // Hide loader
+      commit('mutate', {property: 'loading', value: false});
+    },
+    async loadTypes({ commit }, type) {
+      // Reset loading and error status
+      commit('mutate', {property: 'loading', value: true});
+      commit('mutate', {property: 'error', value: false});
+      // Set searchType to true to disable infinite scroll on home page
+      commit('mutate', {property: 'searchType', value: true});
+
+      try {
+        // Send request to get all pokemon of one type
+        const response = await axios.get(`https://pokeapi.co/api/v2/type/${type}`);
+        const allPokemons = await Promise.all(response.data.pokemon.map(pokemon => axios.get(pokemon.pokemon.url)));
+        
+        // Get only the pokemon whose id is below 808 because otherwise there is no available image 
+        const filterPokemons = allPokemons.filter(pokemon => pokemon.data.id < 808);
+        // Update state with the datas
+        commit('mutate', {property: 'pokemons', value: filterPokemons});        
+      }
+      catch(error) {
+        commit('mutate', {property: 'error', value: true});
       }
       // Hide loader
       commit('mutate', {property: 'loading', value: false});

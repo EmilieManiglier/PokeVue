@@ -6,25 +6,32 @@
 
     <div v-else>
       <search />
-      <!-- if no pokemon has been searched, display list -->
+
+      <!-- if no pokemon has been searched or if a type has been searched -->
       <div v-if="pokemons.length > 0">
-        <div class="d-flex flex-wrap justify-content-center">
+        <!--if there's an error, display error message -->
+        <div v-if="error">
+          <error :search="searchPokemon" />
+        </div>
+
+        <!--Else, if there's no error, display list -->
+        <div v-else class="d-flex flex-wrap justify-content-center">
           <b-card-group v-for="pokemon in pokemons" :key="pokemon.data.id">
             <pokemon :pokemon="pokemon.data" />
           </b-card-group>
         </div>
-  
-        <Observer @intersect="loadMore" />
+
+        <!-- Prevent infinite scroll if we display list by pokemon's type  -->
+        <div v-if="!searchType">
+          <Observer @intersect="loadMore" />
+        </div>
       </div>
 
       <!-- Else, if a pokemon has been searched  -->
       <div v-else class="d-flex justify-content-center">
       <!--if there's an error, display error message -->
         <div v-if="error">
-          <b-alert show variant="danger" class="text-center">
-            <p>Oops, looks like {{searchPokemon}} doesn't exist !</p>
-            <img src="https://media1.tenor.com/images/fb21c5a0ff18e29aab890d1d1f6d6e64/tenor.gif?itemid=15357817" alt="" class="search-error-image" />
-          </b-alert>
+          <error :search="searchPokemon" />
         </div>
 
         <!--Else, if there's no error, display pokemon -->
@@ -39,13 +46,14 @@
 <script>
 import Pokemon from '@/components/Home/Pokemon'
 import Search from '@/components/Home/Search'
+import Error from '@/components/Home/Error'
 import Observer from '@/components/Home/Observer'
 import Loader from '@/components/Loader'
 import { mapState } from 'vuex'
 
 export default {
   name: 'Home',
-  components: { Pokemon, Search, Loader, Observer },
+  components: { Pokemon, Search, Error, Loader, Observer },
   data() {
     return {
       // offset used to display pokemons
@@ -57,7 +65,8 @@ export default {
     'pokemon',
     'loading',
     'error',
-    'searchPokemon'
+    'searchPokemon',
+    'searchType'
   ]),
   methods: {
     loadMore() {
@@ -76,9 +85,7 @@ export default {
 <style lang="scss" scoped>
 .home {
   padding: 2rem 1rem;
-  .search-error-image {
-    width: 50%;
-    margin-top: 1.5rem;
-  }  
+
+
 }
 </style>
