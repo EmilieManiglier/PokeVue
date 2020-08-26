@@ -3,6 +3,7 @@
     <p class="about-description">{{ description }}</p>
     <div class="about-datas">
       <h3 class="about-datas__title">Pokédex Data</h3>
+      
       <div v-for="(value, name) in about" :key="name">
         <div class="data-container">
           <span class="data-name">{{ name }}</span>
@@ -63,9 +64,6 @@ export default {
         ability => ability.is_hidden === true
       );
     }    
-  }, 
-  created() {
-    // this.$store.dispatch('loadAbout', this.id)
   }
 };
 </script>
@@ -82,6 +80,7 @@ export default {
     text-align: center;
     line-height: 125%;
   }
+
 
   .about-datas {
     .about-datas__title {
@@ -130,7 +129,19 @@ export default {
         font-size: 0.8rem;
       }
     }
+  }
+}
 
+@media screen and (min-width: 768px) {
+  .about .about-datas {
+    .data-container {
+      width: 50%;
+      margin: 1rem auto;
+    }
+
+    .data-name {
+      margin-right: 2rem;
+    }
   }
 }
 </style>

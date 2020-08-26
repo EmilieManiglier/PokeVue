@@ -4,43 +4,42 @@
       <Loader />
     </div>
     
-    <b-card v-else class="my-4 mx-2" no-body>
-      <b-card-header header-tag="nav">
-        <b-nav card-header tabs align="center">
-          <b-nav-item :active="menu.about" @click="toggleMenuLink">About</b-nav-item>
-          <b-nav-item :active="menu.stats" @click="toggleMenuLink">Stats</b-nav-item>
-          <b-nav-item :active="menu.evolution" @click="toggleMenuLink">Evolution</b-nav-item>
-        </b-nav>
-      </b-card-header>
-  
-        <b-card-body class="p-0">
+    <div v-else class="d-md-flex container mx-auto">
 
-          <div class="pt-2 text-center" :class="`${firstType}-light`">
-            <b-card-img class="pokemon-img" :src="`https://assets.pokemon.com/assets/cms2/img/pokedex/full/${pokemonId}.png`" alt=""></b-card-img>
-            <b-card-text>
-              {{ pokemonTitle }}
-            </b-card-text>
-    
-            <b-card-text class="d-flex flex-wrap types">
-              <div
-                class="type"
-                :class="type.type.name"
-                v-for="type in pokemon.types"
-                :key="type.slot"
-              >
-                {{type.type.name}}
-              </div>
-            </b-card-text>
+      <div class="pt-2 text-center pokemon-info d-md-flex flex-md-column align-items-md-center justify-content-md-center" :class="`${firstType}-light`">
+        <b-img class="pokemon-img" :src="`https://assets.pokemon.com/assets/cms2/img/pokedex/full/${pokemonId}.png`" alt=""></b-img>
+        <p class="name">{{ pokemonTitle }}</p>
+
+        <div class="d-flex flex-wrap types">
+          <div
+            class="type"
+            :class="type.type.name"
+            v-for="type in pokemon.types"
+            :key="type.slot"
+          >
+            {{type.type.name}}
           </div>
-        
-        <about v-if="menu.about" :id="this.id" />
-        <stats v-if="menu.stats" :id="this.id" />
-        <evolution v-if="menu.evolution" :name="pokemon.name" />
+        </div>
+      </div>
 
-      </b-card-body>
-    </b-card>
+      <b-card no-body>
+        <b-card-header header-tag="nav">
+          <b-nav card-header tabs align="center">
+            <b-nav-item :active="menu.about" @click="toggleMenuLink">About</b-nav-item>
+            <b-nav-item :active="menu.stats" @click="toggleMenuLink">Stats</b-nav-item>
+            <b-nav-item :active="menu.evolution" @click="toggleMenuLink">Evolution</b-nav-item>
+          </b-nav>
+        </b-card-header>
+    
+        <b-card-body class="p-0">
+          <about v-if="menu.about" :id="this.id" />
+          <stats v-if="menu.stats" :id="this.id" />
+          <evolution v-if="menu.evolution" :name="pokemon.name" />
+        </b-card-body>
+      </b-card>
+    </div>
+
   </div>
-
 </template>
 
 <script>
@@ -94,12 +93,34 @@ export default {
 @import '@/assets/styles/mixin';
 @import '@/assets/styles/types';
 
+.container {
+  margin-top: 4rem;
+
+  .name {
+    font-weight: bold;
+    font-size: 1.3rem;
+  }
+
+  .card, .card-header {
+    border: none;
+    border-radius: 0;
+  }
+}
+.nav-link {
+  color: #515585;
+}
+
+.nav-link.active {
+  color: #c00d0d;
+  font-weight: bold;
+}
+
 .pokemon-img {
   width: 150px;
 }
 
 .types {
-  width: 80%;
+  width: 60%;
   margin: auto;
 
   .type {
@@ -115,17 +136,29 @@ export default {
   }
 }
 
-
 @media screen and (min-width: 768px) {
   .types {
-    width: 20%;
+    width: 30%;
+    margin: 0;
+  }
+
+  .pokemon-info {
+    width: 60%;
+    min-height: 500px;
+    max-height: 500px;
+  }
+
+  .card {
+    width: 80%;
+    min-height: 500px;
+    max-height: 500px;
+    @include prefix((overflow: auto));
   }
 }
 
 @media screen and (min-width: 1900px) {
-  .types {
-    width: 10%;
+  .pokemon-img {
+    width: 300px;
   }
 }
-
 </style>
