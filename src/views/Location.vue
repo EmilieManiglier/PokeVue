@@ -2,16 +2,16 @@
   <div class="mt-4 mx-2">
     <loader v-if="loading" />
 
-    <div v-else class="container">
-      <div class="captured-container sticky-top">
-        <b-card header="Captured Pokemons" class="w-100" no-body>
+    <div v-else class="container-fluid d-md-flex flex-md-row-reverse justify-content-md-around">
+      <div class="captured-container sticky-top row mt-4 col-md-6">
+        <b-card header="Captured Pokemons" class="w-100 text-center" no-body>
           <div class="d-flex flex-wrap justify-content-center align-items-center captured">
             <b-card-text class="p-4">Select Pokemons that you have already captured or drop them here</b-card-text>
           </div>
         </b-card>
       </div>
 
-      <div class="mt-4">
+      <div class="mt-4 row col-md-4">
         <div role="tablist">
           
           <b-card no-body class="mb-1" v-for="location in locations" :key="location.data.id">
@@ -33,12 +33,12 @@
             </b-collapse>
           </b-card>
 
-          <div class="text-center">
+          <div v-if="showSpinner" class="text-center">
             <div class="spinner-border text-light" role="status">
               <span class="sr-only">Loading...</span>
             </div>
+            <observer @intersect="loadMore" />
           </div>
-          <observer @intersect="loadMore" />
 
         </div>
       </div>
@@ -56,7 +56,8 @@ export default {
   components: { Loader, Observer },
   data() {
     return {
-      offset: 0
+      offset: 0,
+      showSpinner: true
     }
   },
   computed: {
@@ -93,9 +94,16 @@ export default {
       return string.replace(/-/g, ' ');
     },
     loadMore() {
-      // Load the 20 next location whenever we reach bottom of the screen
-      this.offset += 20;
-      this.$store.dispatch("loadLocations", this.offset);
+      // Allow infinite scroll until offset reaches 680
+      if(this.offset <= 680) {
+        // Load the 20 next location whenever we reach bottom of the screen
+        this.offset += 20;
+        this.$store.dispatch("loadLocations", this.offset);
+      }
+      else {
+        // Hide spinner since there are no more locations to load
+        this.showSpinner = false;
+      }
     }
   },
   created() {
@@ -110,9 +118,9 @@ export default {
   overflow: auto;
   margin-bottom: 2rem;
 
-  .card {
-    border-bottom: 2px solid #000;
-  }
+  // .card {
+  //   border-bottom: 2px solid #000;
+  // }
 
   .card-header {
     background-color: #c00d0d;
