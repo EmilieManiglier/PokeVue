@@ -5,9 +5,30 @@
     <div v-else class="container-fluid d-md-flex flex-md-row-reverse justify-content-md-around">
       <div class="captured-container sticky-top row mt-4 col-md-6">
         <b-card header="Captured Pokemons" class="w-100 text-center" no-body>
-          <div class="d-flex flex-wrap justify-content-center align-items-center captured">
             <b-card-text class="p-4">Select Pokemons that you have already captured or drop them here</b-card-text>
-          </div>
+
+            <draggable
+              class="dragArea d-flex flex-wrap justify-content-center drop-container"
+              :list="capturedPokemon"
+              :group="{ name: 'pokemon', pull: false, put: true }"
+            >
+              <div
+                v-for="pokemon in capturedPokemon"
+                :key="pokemonId(pokemon.pokemon.name)"
+              >
+                <b-card-img
+                  :src="getPokemonImage(pokemon.pokemon.url)"
+                  :alt="pokemon.pokemon.name"
+                  :id="pokemon.pokemon.name"
+                  class="pokemon-sprite"
+                />
+                <b-tooltip :target="pokemon.pokemon.name" triggers="hover">
+                  <span class="tooltip-pokemon">{{pokemon.pokemon.name}}</span>
+                </b-tooltip>
+              </div>
+              <img src="@/assets/pokeball.png" alt="" class="pokeball" />
+            </draggable>
+
         </b-card>
       </div>
 
@@ -21,14 +42,27 @@
 
             <b-collapse :id="`accordion-${location.data.id}`" visible accordion="my-accordion" role="tabpanel">
               <b-card-body>
-                <b-card-text class="d-flex flex-wrap justify-content-center">
-                  <div v-for="pokemon in getPokemonByLocation(location.data.name)" :key="pokemon.id">
-                    <b-card-img :src="pokemon.image" :alt="pokemon.name" :id="`${location.data.name}-${pokemon.name}`"></b-card-img>
-                      <b-tooltip :target="`${location.data.name}-${pokemon.name}`" triggers="hover">
-                        <span class="tooltip-pokemon">{{pokemon.name}}</span>
-                      </b-tooltip>
+
+                <draggable
+                  class="d-flex flex-wrap justify-content-center drag-container"
+                  v-model="location.data.pokemon_encounters"
+                  :group="{ name: 'pokemon', pull: 'clone', put: false }"
+                  draggable=".drag-item"
+                  @remove="handleDrag"
+                >
+                  <div v-for="pokemon in location.data.pokemon_encounters" :key="pokemon.id" :class="`drag-item ${pokemon.pokemon.name}`">
+                    <b-card-img
+                      :src="getPokemonImage(pokemon.pokemon.url)"
+                      :alt="pokemon.pokemon.name"
+                      :id="`${location.data.name}-${pokemon.pokemon.name}`"
+                      class="pokemon-sprite"
+                    />
+                    <b-tooltip :target="`${location.data.name}-${pokemon.pokemon.name}`" triggers="hover">
+                      <span class="tooltip-pokemon">{{pokemon.pokemon.name}}</span>
+                    </b-tooltip>
                   </div>
-                </b-card-text>
+                </draggable>
+
               </b-card-body>
             </b-collapse>
           </b-card>
@@ -49,49 +83,33 @@
 <script>
 import Loader from '@/components/Loader'
 import Observer from '@/components/Observer'
+import draggable from "vuedraggable";
 import { mapState } from 'vuex'
 
 export default {
   name: "location",
-  components: { Loader, Observer },
+  components: { Loader, Observer, draggable },
   data() {
     return {
       offset: 0,
-      showSpinner: true
+      showSpinner: true,
+      capturedPokemon: []
     }
   },
-  computed: {
-    ...mapState(['locations', 'loading']),
-    pokemonData() {
-      const data = [];
-      this.locations.map(location => {
-      // For each pokemon found in current location
-        location.data.pokemon_encounters.map(pokemon => {
-          // Split url after 'pokemon/'
-          const idFromUrl = pokemon.pokemon.url.split('pokemon/');
-          // Remove last char (/) in the string to get only pokemon id
-          const id = idFromUrl[1].slice(0, -1);
-          // Create an object with pokemon id, name, image and its location
-          const pokemonInfo = {
-            id: id,
-            name: pokemon.pokemon.name,
-            image: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`,
-            location: location.data.name,
-          }
-          // Fill data array with pokemonInfo
-          data.push(pokemonInfo);
-        })
-      })
-      return data;
-    },
-  },
+  computed: mapState(['locations', 'loading']),
   methods: {
-    getPokemonByLocation(location) {
-      return this.pokemonData.filter(pokemon => pokemon.location === location)
-    },
     removeHyphen(string) {
       // Remove all hyphens from a string
       return string.replace(/-/g, ' ');
+    },
+    updatePokemonClass(pokemon) {
+      // Get all element having the same class (which is pokemon's name) as event target
+      const samePokemons = document.querySelectorAll(`.${pokemon}`);
+      samePokemons.forEach(currentPokemon => {
+        // For each pokemon found, change its classes to prevent it to be drag and drop again
+        currentPokemon.classList.remove('drag-item');
+        currentPokemon.classList.add('inactive-drag');
+      })
     },
     loadMore() {
       // Allow infinite scroll until offset reaches 680
@@ -99,11 +117,36 @@ export default {
         // Load the 20 next location whenever we reach bottom of the screen
         this.offset += 20;
         this.$store.dispatch("loadLocations", this.offset);
+
+        this.capturedPokemon.forEach(pokemon => {
+          this.updatePokemonClass(pokemon.pokemon.name)
+        })
       }
       else {
         // Hide spinner since there are no more locations to load
         this.showSpinner = false;
       }
+    },
+    getPokemonImage(url) {
+      // Cut the url bebore and after pokemon/
+      const idFromUrl = url.split('pokemon/');
+      // Remove last char (/) in the last part of the string to get only pokemon id
+      const id = idFromUrl[1].slice(0, -1);
+      // Return pokemon sprite url
+      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`
+    },
+    handleDrag(evt) {
+      this.updatePokemonClass(evt.item.lastElementChild.alt);
+    },
+    pokemonId(pokemon) {
+      /* 
+      A same pokemon can be on several locations so if we oonly put pokemon's name as id for the tooltip
+      It will only work for the first location, if we try to hover the same pokemon on an other location 
+      we won't be able to see the tooltip
+      Therefore, the id has to be unique for each pokemon on each location
+      To do so, we'll generate a random number and use it for the id
+      */
+      return `${pokemon}-${Math.floor(Math.random() * Math.floor(300))}`
     }
   },
   created() {
@@ -114,13 +157,8 @@ export default {
 
 <style lang='scss' scoped>
 .captured-container {
-  max-height: 300px;
-  overflow: auto;
+  max-height: 500px;
   margin-bottom: 2rem;
-
-  // .card {
-  //   border-bottom: 2px solid #000;
-  // }
 
   .card-header {
     background-color: #c00d0d;
@@ -142,4 +180,34 @@ export default {
   text-transform: capitalize;
 }
 
+.drag-item {
+  cursor: pointer;
+}
+
+.inactive-drag{
+  filter: grayscale(100%);
+  cursor: not-allowed;
+}
+
+.pokemon-sprite {
+  position: relative;
+  z-index: 2;
+}
+
+.drop-container {
+  background-color: rgba(#ec625f, 0.5);
+  margin: 0 0.5rem 0.5rem;
+  min-height: 300px;
+  max-height: 400px;
+  overflow: auto;
+  position: relative;
+
+  .pokeball {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.3;
+  }
+}
 </style>
