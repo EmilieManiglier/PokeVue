@@ -219,10 +219,10 @@ export default new Vuex.Store({
       // Hide loader
       commit('mutate', {property: 'loading', value: false});
     },
-    async loadLocations({ commit }) {
+    async loadLocations({ commit }, offset) {
       try {
         // Send request to get location-area datas
-        const response = await axios.get('https://pokeapi.co/api/v2/location-area?offset=0&limit=20');
+        const response = await axios.get(`https://pokeapi.co/api/v2/location-area?offset=${offset}&limit=20`);
         const allLocations = await Promise.all(response.data.results.map(location => axios.get(location.url)));
 
         allLocations.map(currentLocation => {

@@ -1,6 +1,8 @@
 <template>
   <div class="mt-4 mx-2">
-    <div class="container">
+    <loader v-if="loading" />
+
+    <div v-else class="container">
       <div class="captured-container sticky-top">
         <b-card header="Captured Pokemons" class="w-100" no-body>
           <div class="d-flex flex-wrap justify-content-center align-items-center captured">
@@ -31,6 +33,13 @@
             </b-collapse>
           </b-card>
 
+          <div class="text-center">
+            <div class="spinner-border text-light" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+          </div>
+          <observer @intersect="loadMore" />
+
         </div>
       </div>
     </div>
@@ -38,12 +47,20 @@
 </template>
 
 <script>
+import Loader from '@/components/Loader'
+import Observer from '@/components/Observer'
 import { mapState } from 'vuex'
 
 export default {
   name: "location",
+  components: { Loader, Observer },
+  data() {
+    return {
+      offset: 0
+    }
+  },
   computed: {
-    ...mapState(['locations']),
+    ...mapState(['locations', 'loading']),
     pokemonData() {
       const data = [];
       this.locations.map(location => {
@@ -74,10 +91,15 @@ export default {
     removeHyphen(string) {
       // Remove all hyphens from a string
       return string.replace(/-/g, ' ');
+    },
+    loadMore() {
+      // Load the 20 next location whenever we reach bottom of the screen
+      this.offset += 20;
+      this.$store.dispatch("loadLocations", this.offset);
     }
   },
   created() {
-    this.$store.dispatch("loadLocations");
+    this.$store.dispatch("loadLocations", this.offset);
   }
 };
 </script>
