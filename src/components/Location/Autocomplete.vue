@@ -3,12 +3,14 @@
     <div class="autocomplete mb-4 mr-2">
       <b-form-input
         type="text"
-        @input="onChange"
         v-model.trim="search"
+        @click="onClick"
+        @input="onChange"
         @keydown.down="onArrowDown"
         @keydown.up="onArrowUp"
         @keydown.enter="onEnter"
         placeholder="Find a location"
+        name="location"
       />
       <ul
         id="autocomplete-results"
@@ -58,11 +60,16 @@
       disableSearch() {
         // If input is empty set disable to true to disable submit button
         return this.search === '' ? true : false;
-      }
+      },
     },
     methods: {
-      onChange() {
+      onChange(value) {
         // Open suggestions list
+        this.filterSuggestions();
+        this.isOpen = true;
+        this.search = value;
+      },
+      onClick() {
         this.filterSuggestions();
         this.isOpen = true;
       },
@@ -90,13 +97,23 @@
           this.arrowCounter -= 1;
         }
       },
-      onEnter() {
-        // Set input value to selected suggestion
-        this.search = this.suggestions[this.arrowCounter];
-        // Close suggestions list
-        this.isOpen = false;
-        // Reset arrow counter
-        this.arrowCounter = -1;
+      onEnter(evt) {
+        // Check if arrowCounter value isn't -1 which means key down has been pressed
+        if(this.arrowCounter > -1) {
+          // Set input value to selected suggestion
+          this.search = this.suggestions[this.arrowCounter];
+          // Close suggestions list
+          this.isOpen = false;
+          // Reset arrow counter
+          this.arrowCounter = -1;
+        }
+        else {
+          // Else, enter key has been pressed without key down event
+          // Update search with input value
+          this.search = evt.currentTarget.value;
+          this.isOpen = false;
+        }
+        
       },
       handleClickOutside(evt) {
         if (!this.$el.contains(evt.target)) {
@@ -105,10 +122,8 @@
         }
       },
       onSubmit() {
-        // Replace all spaces by hyphens
-        const search = this.search.replace(/ /g, '-');
         // Warn the parent component that the form was submitted
-        this.$emit('submit-search', search);
+        this.$emit('submit-search', this.search);
         // reset input value
         this.search = '';
       }

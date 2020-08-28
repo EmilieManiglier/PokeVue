@@ -1,7 +1,20 @@
 <template>
   <fragment>
 
-    <autocomplete :items="allLocations" @submit-search="searchLocation" />
+    <autocomplete
+      :items="allLocations"
+      @submit-search="searchLocation"
+    />
+
+    <b-alert
+      :show="error"
+      dismissible
+      fade
+      variant="danger"
+      class="w-100 text-center"
+    >
+      No location found.
+    </b-alert>
 
     <div role="tablist">
       <b-card no-body class="mb-1" v-for="(location, index) in locations" :key="location.data.id">
@@ -74,6 +87,7 @@ export default {
     return {
       offset: 0,
       showSpinner: true,
+      error: false
     }
   },
   methods: {
@@ -98,7 +112,18 @@ export default {
       this.$emit('drag', evt);
     },
     searchLocation(search) {
-      this.$store.dispatch('loadLocation', search)
+      // If search value is in allLocations array
+      if(this.allLocations.indexOf(search) > -1) {
+        // Send request to get location data
+        // Replace every spaces in search by hyphens
+        this.$store.dispatch('loadLocation', search.replace(/ /g, '-'));
+        // Reset error value to hide alert message
+        this.error = false;
+      }
+      else {
+        // Else, if the value doesn't exist, display alert message
+        this.error = true;
+      }
     }
   }
 };
