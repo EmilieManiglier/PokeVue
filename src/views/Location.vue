@@ -55,7 +55,8 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch("loadLocations", this.offset);
+    this.$store.dispatch("loadLocations", {offset: this.offset, limit: 20});
+    this.$store.dispatch("loadLocations", {offset: 0, limit: 683});
   }
 };
 </script>

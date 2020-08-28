@@ -36,6 +36,8 @@ export default new Vuex.Store({
     pokemonIds: [],
     // locations datas
     locations: [],
+    // List of the 683 locations
+    allLocations: [],
     // Pokemons that have been captured
     capturedPokemon: [],
     // Location where pokemon has been captured
@@ -48,24 +50,19 @@ export default new Vuex.Store({
     }
   },
   mutations: {
-    mutate(state, payload) {
-      const { property, value } = payload;
+    mutate(state, { property, value }) {
       state[property] = value;
+    },
+    mutateArray(state, { property, value, iterate }) {
+      if(iterate) {
+        state[property] = [...state[property], ...value]
+      }
+      else {
+        state[property] = [...state[property], value]
+      }
     },
     updateAbout(state, about) {
       state.about = {...state.about, ...about}
-    },
-    updatePokemons(state, pokemons) {
-      state.pokemons = [...state.pokemons, ...pokemons];
-    },
-    updateId(state, id) {
-      state.pokemonIds = [...state.pokemonIds, id]
-    },
-    updateLocations(state, location) {
-      state.locations = [...state.locations, ...location]
-    },
-    updateCapturedPokemon(state, pokemon) {
-      state.capturedPokemon = [...state.capturedPokemon, pokemon]
     },
   },
   actions: {
@@ -82,10 +79,9 @@ export default new Vuex.Store({
         if(!this.state.pokemons.some(poke => poke.data.id === pokemon.data.id)) {
           // If not, Update pokemons array in the state with the new array
           // This prevents for loop key duplicate error during render
-          commit('updatePokemons', allPokemons);
+          commit('mutateArray', {property: 'pokemons', value: allPokemons, iterate: true});      
         }
       })
-
       // hide loader
       commit('mutate', {property: 'loading', value: false});
     },
@@ -194,7 +190,8 @@ export default new Vuex.Store({
             id: pokemon.data.id,
             name: pokemon.data.name
           }
-          commit('updateId', pokemonId);
+          commit('mutateArray', {property: 'pokemonIds', value: pokemonId, iterate: false});
+
         })
       }
       catch(error) {
@@ -226,26 +223,52 @@ export default new Vuex.Store({
       // Hide loader
       commit('mutate', {property: 'loading', value: false});
     },
-    async loadLocations({ commit }, offset) {
+    async loadLocations({ commit }, {offset, limit}) {
       try {
         // Send request to get location-area datas
-        const response = await axios.get(`https://pokeapi.co/api/v2/location-area?offset=${offset}&limit=20`);
+        const response = await axios.get(`https://pokeapi.co/api/v2/location-area?offset=${offset}&limit=${limit}`);
         const allLocations = await Promise.all(response.data.results.map(location => axios.get(location.url)));
 
-        allLocations.map(currentLocation => {
-          // For each location, check if location already exist in the array
-          if(!this.state.locations.some(location => location.data.id === currentLocation.data.id)) {
-            // If not, Update locations array in the state with the new array
-            // This prevents for loop key duplicate error during render
-            commit('updateLocations', allLocations);
-          }
-        })
+        // If limit is equal to 683, we want to get all locations in the game
+        if(limit === 683) {     
+          // for each location, remove hyphens from location name   
+          const locations = allLocations.map(location => location.data.name.replace(/-/g, ' '));
+          // Update state with the modified array
+          commit('mutateArray', {property: 'allLocations', value: locations, iterate: true});
+        }
+        else {
+          // else we only want to get 20 locations starting from the offset
+          allLocations.map(currentLocation => {
+            // For each location, check if location already exist in the array
+            if(!this.state.locations.some(location => location.data.id === currentLocation.data.id)) {
+              // If not, Update locations array in the state with the new array
+              // This prevents for loop key duplicate error during render
+              commit('mutateArray', {property: 'locations', value: allLocations, iterate: true});
+            }
+          })
+        }
       }
       catch(error) {
         console.log(error);
       }
       commit('mutate', {property: 'loading', value: false});
-    }
+    },
+    async loadLocation({ commit }, location) {
+      try {
+        // Send request to get location-area datas
+        const response = await axios.get(`https://pokeapi.co/api/v2/location-area/${location}`);
+        // Push the response into an array
+        const newLocation = [];
+        newLocation.push(response);
+
+        // Update state with the new location
+        commit('mutate', {property: 'locations', value: newLocation});
+      }
+      catch(error) {
+        console.log(error);
+      }
+      commit('mutate', {property: 'loading', value: false});
+    },    
   },
   modules: {
   }

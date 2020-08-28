@@ -46,7 +46,7 @@ export default {
           }
         }
         // Update capturedPokemon array with the new pokemon in order to display it on Drop component
-        this.$store.commit('updateCapturedPokemon', pokemon);
+        this.$store.commit('mutateArray',{property: 'capturedPokemon', value: pokemon, iterate: false});
 
         // Get pokemon location from its id, remove hyphens in the string and update state
         const string = evt.currentTarget.id.split('-pokemon-');

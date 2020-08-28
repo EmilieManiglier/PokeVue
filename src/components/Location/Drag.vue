@@ -1,68 +1,75 @@
 <template>
-  <div role="tablist">
-    <b-card no-body class="mb-1" v-for="location in locations" :key="location.data.id">
-      <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button
-          block
-          v-b-toggle="`accordion-${location.data.id}`"
-          class="btn-location"
-        >
-          {{removeHyphen(location.data.name)}}
-        </b-button>
-      </b-card-header>
+  <fragment>
 
-      <b-collapse
-        :id="`accordion-${location.data.id}`"
-        visible
-        accordion="my-accordion"
-        role="tabpanel"
-      >
-        <b-card-body>
-          <draggable
-            class="d-flex flex-wrap justify-content-center drag-container"
-            v-model="location.data.pokemon_encounters"
-            :group="{ name: 'pokemon', pull: 'clone', put: false }"
-            draggable=".drag-item"
-            @remove="onRemove"
+    <autocomplete :items="allLocations" @submit-search="searchLocation" />
+
+    <div role="tablist">
+      <b-card no-body class="mb-1" v-for="(location, index) in locations" :key="location.data.id">
+        <b-card-header header-tag="header" class="p-1" role="tab">
+          <b-button
+            block
+            v-b-toggle="`accordion-${location.data.id}`"
+            class="btn-location"
           >
-            <div
-              v-for="pokemon in location.data.pokemon_encounters"
-              :key="pokemon.pokemon.name"
-              :class="`drag-item ${pokemon.pokemon.name}`"
+            {{removeHyphen(location.data.name)}}
+          </b-button>
+        </b-card-header>
+  
+        <b-collapse
+          :id="`accordion-${location.data.id}`"
+          :visible="index === 0 ? true : false"
+          accordion="my-accordion"
+          role="tabpanel"
+        >
+          <b-card-body>
+            <draggable
+              class="d-flex flex-wrap justify-content-center drag-container"
+              v-model="location.data.pokemon_encounters"
+              :group="{ name: 'pokemon', pull: 'clone', put: false }"
+              draggable=".drag-item"
+              @remove="onRemove"
             >
-              <pokemon-sprite 
-                :src="getPokemonImage(pokemon.pokemon.url)"
-                :alt="pokemon.pokemon.name"
-                :id="`${location.data.name}-pokemon-${pokemon.pokemon.name}`"
-                :content="pokemon.pokemon.name"
-                :url="pokemon.pokemon.url"
-              />
-            </div>
-          </draggable>
-        </b-card-body>
-      </b-collapse>
-    </b-card>
-
-    <div v-if="showSpinner" class="text-center">
-      <div class="spinner-border text-light" role="status">
-        <span class="sr-only">Loading...</span>
+              <div
+                v-for="pokemon in location.data.pokemon_encounters"
+                :key="pokemon.pokemon.name"
+                :class="`drag-item ${pokemon.pokemon.name}`"
+              >
+                <pokemon-sprite 
+                  :src="getPokemonImage(pokemon.pokemon.url)"
+                  :alt="pokemon.pokemon.name"
+                  :id="`${location.data.name}-pokemon-${pokemon.pokemon.name}`"
+                  :content="pokemon.pokemon.name"
+                  :url="pokemon.pokemon.url"
+                />
+              </div>
+            </draggable>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
+  
+      <div v-if="showSpinner" class="text-center">
+        <div class="spinner-border text-light" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <observer @intersect="loadMore" />
       </div>
-      <observer @intersect="loadMore" />
     </div>
-  </div>
+  </fragment>
 </template>
 
 <script>
 import { mapState } from 'vuex' 
-import draggable from "vuedraggable";
+import { Fragment } from 'vue-fragment'
+import draggable from "vuedraggable"
 import { updatePokemonClass } from '@/utils/functions.js'
 import Observer from '@/components/Observer'
+import Autocomplete from '@/components/Location/Autocomplete'
 import PokemonSprite from '@/components/Location/PokemonSprite'
 
 export default {
   props: ['removeHyphen', 'getPokemonImage'],
-  components: { draggable, Observer, PokemonSprite },
-  computed: mapState(['locations']),
+  components: { Fragment, draggable, Observer, PokemonSprite, Autocomplete },
+  computed: mapState(['locations', 'capturedPokemon', 'allLocations']),
   data() {
     return {
       offset: 0,
@@ -75,7 +82,7 @@ export default {
       if(this.offset <= 680) {
         // Load the 20 next location whenever we reach bottom of the screen
         this.offset += 20;
-        this.$store.dispatch("loadLocations", this.offset);
+        this.$store.dispatch("loadLocations", {offset: this.offset, limit: 20});
 
         this.capturedPokemon.forEach(pokemon => {
           updatePokemonClass(pokemon.pokemon.name)
@@ -89,6 +96,9 @@ export default {
     onRemove(evt) {
       // Emit an event to parent component when a pokemon is removed from location list
       this.$emit('drag', evt);
+    },
+    searchLocation(search) {
+      this.$store.dispatch('loadLocation', search)
     }
   }
 };
