@@ -27,7 +27,7 @@
           >
             <div
               v-for="pokemon in location.data.pokemon_encounters"
-              :key="pokemon.id"
+              :key="pokemon.pokemon.name"
               :class="`drag-item ${pokemon.pokemon.name}`"
             >
               <pokemon-sprite 
@@ -35,6 +35,7 @@
                 :alt="pokemon.pokemon.name"
                 :id="`${location.data.name}-pokemon-${pokemon.pokemon.name}`"
                 :content="pokemon.pokemon.name"
+                :url="pokemon.pokemon.url"
               />
             </div>
           </draggable>
@@ -52,13 +53,14 @@
 </template>
 
 <script>
+import { mapState } from 'vuex' 
 import draggable from "vuedraggable";
+import { updatePokemonClass } from '@/utils/functions.js'
 import Observer from '@/components/Observer'
 import PokemonSprite from '@/components/Location/PokemonSprite'
-import { mapState } from 'vuex' 
 
 export default {
-  props: ['updatePokemonClass', 'capturedPokemon', 'removeHyphen', 'getPokemonImage'],
+  props: ['removeHyphen', 'getPokemonImage'],
   components: { draggable, Observer, PokemonSprite },
   computed: mapState(['locations']),
   data() {
@@ -76,7 +78,7 @@ export default {
         this.$store.dispatch("loadLocations", this.offset);
 
         this.capturedPokemon.forEach(pokemon => {
-          this.updatePokemonClass(pokemon.pokemon.name)
+          updatePokemonClass(pokemon.pokemon.name)
         })
       }
       else {
@@ -87,7 +89,7 @@ export default {
     onRemove(evt) {
       // Emit an event to parent component when a pokemon is removed from location list
       this.$emit('drag', evt);
-    },
+    }
   }
 };
 </script>

@@ -17,3 +17,17 @@ export const formatId = (id) => {
   if(id < 100) return `0${id}`;
   return id;
 }
+
+/* 
+ * @param {string} pokemon's name
+ * change classes of every element with pokemon's name in its classList
+*/
+export const updatePokemonClass = (pokemon) => {
+  // Find all pokemons with the same class as target pokemon
+  const samePokemons = document.querySelectorAll(`.${pokemon}`);
+  samePokemons.forEach(currentPokemon => {
+    // For each pokemon found, change its classes to prevent drag and drop or click events
+    currentPokemon.classList.remove('drag-item');
+    currentPokemon.classList.add('inactive-drag', 'inactive-click');
+  })
+}

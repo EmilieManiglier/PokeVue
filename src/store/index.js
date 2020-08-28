@@ -35,7 +35,11 @@ export default new Vuex.Store({
     // Pokemon name and id used to get pokemon's image 
     pokemonIds: [],
     // locations datas
-    locations: []
+    locations: [],
+    // Pokemons that have been captured
+    capturedPokemon: [],
+    // Location where pokemon has been captured
+    capturedLocation: ''
   },
   getters: {
     getFirstType(state) {
@@ -59,7 +63,10 @@ export default new Vuex.Store({
     },
     updateLocations(state, location) {
       state.locations = [...state.locations, ...location]
-    }
+    },
+    updateCapturedPokemon(state, pokemon) {
+      state.capturedPokemon = [...state.capturedPokemon, pokemon]
+    },
   },
   actions: {
     async loadPokemons({ commit }, offset) {

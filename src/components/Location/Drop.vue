@@ -1,6 +1,6 @@
 <template>
   <b-card header="Captured Pokemons" class="w-100 text-center" no-body>
-    <b-card-text class="p-4">Select Pokemons that you have already captured or drop them here</b-card-text>
+    <b-card-text class="p-4">Click on the Pokemons that you have already captured or drop them here</b-card-text>
 
     <draggable
       class="dragArea d-flex flex-wrap justify-content-center drop-container"
@@ -12,7 +12,7 @@
           :src="getPokemonImage(pokemon.pokemon.url)"
           :alt="pokemon.pokemon.name"
           :id="pokemon.pokemon.name"
-          :content="`${pokemon.pokemon.name} captured in ${caputeredLocation}`"
+          :content="`${pokemon.pokemon.name} captured in ${capturedLocation}`"
         />
       </div>
       <img src="@/assets/pokeball.png" alt class="pokeball" />
@@ -23,9 +23,11 @@
 <script>
 import draggable from "vuedraggable";
 import PokemonSprite from '@/components/Location/PokemonSprite'
+import { mapState } from 'vuex' 
 
 export default {
-  props: ['getPokemonImage', 'capturedPokemon', 'caputeredLocation'],
+  props: ['getPokemonImage'],
+  computed: mapState(['capturedPokemon', 'capturedLocation']),
   components: { draggable, PokemonSprite},
   methods: {
     pokemonId(pokemon) {
