@@ -1,9 +1,15 @@
 <template>
-  <div class="home">
+  <div class="home text-center">
     <Loader v-if="loading"/>
 
     <div v-else>
       <search />
+      <b-form-select
+        v-model="selected"
+        :options="options"
+        class="col-md-4 my-2"
+        @change="onChange"
+      ></b-form-select>
 
       <!-- if no pokemon has been searched or if a type has been searched -->
       <div v-if="pokemons.length > 0">
@@ -53,7 +59,13 @@ export default {
     return {
       // offset used to display pokemons
       offset: 0,
-      showSpinner: true
+      showSpinner: true,
+      selected: null,
+      options: [
+        { value: null, text: 'Find Pokemons by alphabetical order' },
+        { value: 'ascending', text: 'Pokemon A-Z' },
+        { value: 'descending', text: 'Pokemon Z-A' },
+      ]      
     }
   },
   computed: mapState([
@@ -74,17 +86,24 @@ export default {
         // Increment offset by 20
         this.offset += 20;        
         // Load the 20 next pokemons whenever we reach bottom of the screen
-        this.$store.dispatch('loadPokemons', this.offset);
+        this.$store.dispatch('loadPokemons', {offset: this.offset, limit: 20});
+
       }
       else {
         // Hide spinner since there are no more pokemons to load
         this.showSpinner = false;
       }
     },
+    onChange(order) {
+      const isAsc = order === 'ascending' ? true : false;
+      // Load pokemons by ascending or descending alphabetical order
+      this.$store.dispatch('loadPokemons', {offset: 0, limit: 807, isAsc: isAsc});
+    }
   },
   created() {
     // Load the 20 first pokemons
-    this.$store.dispatch('loadPokemons', this.offset);
+    this.$store.dispatch('loadPokemons', {offset: this.offset, limit: 20});
+
   },
 }
 </script>

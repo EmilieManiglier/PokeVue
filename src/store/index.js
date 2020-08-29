@@ -64,22 +64,48 @@ export default new Vuex.Store({
     },
   },
   actions: {
-    async loadPokemons({ commit }, offset) {
-      const response = await axios.get(`https://pokeapi.co/api/v2/pokemon?offset=${offset}&limit=20`);
+    async loadPokemons({ commit }, {offset, limit, isAsc = null }) {
+      commit('mutate', {property: 'loading', value: true});
+
+      const response = await axios.get(`https://pokeapi.co/api/v2/pokemon?offset=${offset}&limit=${limit}`);
       /* 
       With the first response we only get pokemon's name and an url 
       In order to get more informations about the pokemon we'll use the url to send an other request to the API and we'll do it for each pokemons of response.data.results array
       */
       const allPokemons = await Promise.all(response.data.results.map(pokemon => axios.get(pokemon.url)));
-      // Update pokemons array in the state with the new array
-      allPokemons.map(pokemon => {
-        // Check if pokemon already exist in the array
-        if(!this.state.pokemons.some(poke => poke.data.id === pokemon.data.id)) {
-          // If not, Update pokemons array in the state with the new array
-          // This prevents for loop key duplicate error during render
-          commit('mutateArray', {property: 'pokemons', value: allPokemons, iterate: true});      
-        }
-      })
+
+      // If user has selected a sorting order, loads all the 807 pokemons
+      if(isAsc !== null && limit === 807) {
+        // Empty pokemons array
+        commit('mutate', {property: 'pokemons', value: []});
+
+        /* 
+          - If first pokemon name is less than second
+          It should be placed before the second in resulting array => return something negative
+
+          - Else, if it's greater, it should be placed after the second one => return something positive
+
+          - If isAsc is false, reverse logic to get pokemons by descending alphabetical order
+
+        */
+        const sortPokemons = allPokemons.sort((pokemonA, pokemonB) => 
+          (pokemonA.data.name < pokemonB.data.name ? -1 : 1) * (isAsc ? 1 : -1)
+        );
+        // Update pokemons array in the state with the sorted array
+        commit('mutateArray', {property: 'pokemons', value: sortPokemons, iterate: true});    
+      }
+      else {
+        // Else, if there is no sorting order
+        // Update pokemons array in the state with the array containing the 20 first pokemons
+        allPokemons.map(pokemon => {
+          // For each pokemon, check if pokemon already exist in the array
+          if(!this.state.pokemons.some(poke => poke.data.id === pokemon.data.id)) {
+            // If not, Update pokemons array in the state with the new array
+            // This prevents for loop key duplicate error during render
+            commit('mutateArray', {property: 'pokemons', value: allPokemons, iterate: true});      
+          }
+        })
+      }
       // hide loader
       commit('mutate', {property: 'loading', value: false});
     },
