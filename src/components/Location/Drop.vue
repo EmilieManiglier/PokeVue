@@ -16,7 +16,7 @@
             :src="getPokemonImage(pokemon.pokemon.url)"
             :alt="pokemon.pokemon.name"
             :id="pokemon.pokemon.name"
-            :content="`${pokemon.pokemon.name} captured in ${capturedLocation}`"
+            :content="pokemon.pokemon.name"
           />
         </div>
       </fragment>
@@ -34,7 +34,7 @@ import PokemonSprite from '@/components/Location/PokemonSprite'
 
 export default {
   props: ['getPokemonImage'],
-  computed: mapState(['capturedPokemon', 'capturedLocation']),
+  computed: mapState(['capturedPokemon']),
   components: { draggable, Fragment, PokemonSprite},
   methods: {
     pokemonId(pokemon) {

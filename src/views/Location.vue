@@ -47,11 +47,6 @@ export default {
     handleDrag(evt) {
       // Change dragged element classes to prevent it from being drag and drop or clicked again
       updatePokemonClass(evt.item.lastElementChild.alt);
-
-      // Get location name from element id and update state
-      const string = evt.item.lastElementChild.id.split('-pokemon-');
-      const location = this.removeHyphen(string[0]);
-      this.$store.commit('mutate', {property: 'capturedLocation', value: location})
     },
   },
   created() {

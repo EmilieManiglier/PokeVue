@@ -40,8 +40,6 @@ export default new Vuex.Store({
     allLocations: [],
     // Pokemons that have been captured
     capturedPokemon: [],
-    // Location where pokemon has been captured
-    capturedLocation: ''
   },
   getters: {
     getFirstType(state) {

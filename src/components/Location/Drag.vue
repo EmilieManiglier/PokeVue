@@ -97,10 +97,6 @@ export default {
         // Load the 20 next location whenever we reach bottom of the screen
         this.offset += 20;
         this.$store.dispatch("loadLocations", {offset: this.offset, limit: 20});
-
-        this.capturedPokemon.forEach(pokemon => {
-          updatePokemonClass(pokemon.pokemon.name)
-        })
       }
       else {
         // Hide spinner since there are no more locations to load
@@ -124,6 +120,18 @@ export default {
         // Else, if the value doesn't exist, display alert message
         this.error = true;
       }
+    }
+  },
+  updated() {   
+    /* 
+    Whenever Drag component is updated (if we scroll to the bottom of screen or if we search for a location)
+    Check if there are pokemons in the capturedPokemon array
+    If yes, for each pokemon, change the class of every pokemon that has the same name in the locations list to prevent it from being  drag and drop or clicked
+    */
+    if(this.capturedPokemon && this.capturedPokemon.length > 0) {
+      this.capturedPokemon.forEach(pokemon => {
+        updatePokemonClass(pokemon.pokemon.name)
+      })    
     }
   }
 };
@@ -149,5 +157,4 @@ export default {
   filter: grayscale(100%);
   cursor: not-allowed;
 }
-
 </style>
