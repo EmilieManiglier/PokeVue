@@ -6,12 +6,7 @@
       <div class="container p-2 mb-2 home-filters">
         <h2>Filters</h2>
         <search />
-        <b-form-select
-          v-model="selected"
-          :options="options"
-          class="col-md-4 my-2"
-          @change="onChange"
-        ></b-form-select>
+        <order />
         <types-filter />
       </div>
 
@@ -54,6 +49,7 @@
 <script>
 import Pokemon from '@/components/Home/Pokemon'
 import Search from '@/components/Home/Search'
+import Order from '@/components/Home/Order'
 import TypesFilter from '@/components/Home/TypesFilter'
 import Error from '@/components/Home/Error'
 import Observer from '@/components/Observer'
@@ -66,6 +62,7 @@ export default {
   components: {
     Pokemon,
     Search,
+    Order,
     TypesFilter,
     Error,
     Loader,
@@ -77,13 +74,6 @@ export default {
       // offset used to display pokemons
       offset: 0,
       showSpinner: true,
-      selected: null,
-      // Select options
-      options: [
-        { value: null, text: 'Find Pokemons by alphabetical order', disabled: true },
-        { value: 'ascending', text: 'Pokemon A-Z' },
-        { value: 'descending', text: 'Pokemon Z-A' },
-      ]      
     }
   },
   computed: mapState([
@@ -115,18 +105,6 @@ export default {
         // Hide spinner since there are no more pokemons to load
         this.showSpinner = false;
       }
-    },
-    onChange(order) {
-      // Reset values in the state
-      this.$store.commit('mutate', {property: 'maxSlice', value: 0});
-      this.$store.commit('mutate', {property: 'isSorted', value: true});
-      this.$store.commit('mutate', {property: 'loading', value: true});
-
-      // Set isAsc in the datas according to the value chosen by user
-      this.$store.commit('mutate', {property: 'isAsc', value: order});
-
-      // Load pokemons by ascending or descending alphabetical order
-      this.$store.dispatch('loadPokemons', {offset: 0, limit: 807});
     }
   },
   created() {

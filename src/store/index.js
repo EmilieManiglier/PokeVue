@@ -77,7 +77,7 @@ export default new Vuex.Store({
       In order to get more informations about the pokemon we'll use the url to send an other request to the API and we'll do it for each pokemons of response.data.results array
       */
       const allPokemons = await Promise.all(response.data.results.map(pokemon => axios.get(pokemon.url)));
-
+      
       // If user has selected a sorting order, loads all the 807 pokemons
       if(this.state.isAsc !== null) {
         // Empty pokemons array
