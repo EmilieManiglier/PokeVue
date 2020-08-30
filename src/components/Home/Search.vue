@@ -1,8 +1,8 @@
 <template>
-  <b-form class="text-center d-md-flex my-md-4" @submit.prevent="handleSubmit">
+  <b-form class="text-center d-flex my-md-4 mx-auto col-md-4" @submit.prevent="handleSubmit">
     <b-form-input
       size="md"
-      class="my-2 mx-md-2"
+      class="my-2 mx-2"
       placeholder="Try Pikachu, 25 or electric"
       v-model.trim="searchPokemon" 
     >
@@ -65,17 +65,7 @@ export default {
 </script>
 
 <style lang='scss' scoped>
-form {
-  width: 50%;
-  margin: auto;
-
-  .search-btn:disabled {
-    cursor: not-allowed;
-  }
-}
-@media screen and (min-width: 768px) {
-  form {
-    width: 25%;
-  }
+.search-btn:disabled {
+  cursor: not-allowed;
 }
 </style>

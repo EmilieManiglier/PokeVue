@@ -3,13 +3,17 @@
     <Loader v-if="loading"/>
 
     <fragment v-else>
-      <search />
-      <b-form-select
-        v-model="selected"
-        :options="options"
-        class="col-md-4 my-2"
-        @change="onChange"
-      ></b-form-select>
+      <div class="container p-2 mb-2 home-filters">
+        <h2>Filters</h2>
+        <search />
+        <b-form-select
+          v-model="selected"
+          :options="options"
+          class="col-md-4 my-2"
+          @change="onChange"
+        ></b-form-select>
+        <types-filter />
+      </div>
 
       <!-- if no pokemon has been searched or if a type has been searched -->
       <fragment v-if="pokemons.length > 0">
@@ -50,6 +54,7 @@
 <script>
 import Pokemon from '@/components/Home/Pokemon'
 import Search from '@/components/Home/Search'
+import TypesFilter from '@/components/Home/TypesFilter'
 import Error from '@/components/Home/Error'
 import Observer from '@/components/Observer'
 import Loader from '@/components/Loader'
@@ -58,7 +63,15 @@ import { Fragment } from 'vue-fragment'
 
 export default {
   name: 'Home',
-  components: { Pokemon, Search, Error, Loader, Observer, Fragment },
+  components: {
+    Pokemon,
+    Search,
+    TypesFilter,
+    Error,
+    Loader,
+    Observer,
+    Fragment
+  },
   data() {
     return {
       // offset used to display pokemons
@@ -126,5 +139,10 @@ export default {
 <style lang="scss" scoped>
 .home {
   padding: 2rem 1rem;
+
+  .home-filters {
+    background-color: #ffeadb;
+    border-radius: 0.5rem;
+  }
 }
 </style>
