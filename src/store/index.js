@@ -102,7 +102,14 @@ export default new Vuex.Store({
         commit('mutateArray', {property: 'pokemons', value: newArray, iterate: true});              
       }
       else {
-        // Else, update pokemons array with the response from API
+        // Else, check if offset is equal to 0
+        // If true, it means that home view is (re)loaded 
+        // (otherwise it would means that we want to loadMore pokemons on scroll)
+        if(offset === 0) {
+          // Empty pokemons array in order to avoid duplicate pokemons
+          commit('mutate', {property: 'pokemons', value: []});
+        }  
+        // Update pokemons array with the response from pokeAPI
         commit('mutateArray', {property: 'pokemons', value: allPokemons, iterate: true});      
       }      
 
