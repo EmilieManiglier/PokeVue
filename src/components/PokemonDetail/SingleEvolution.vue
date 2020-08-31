@@ -16,7 +16,6 @@
       <p>{{capitalName(secondEvolutionName)}}</p>
     </div>
   </div>
-
 </template>
 
 <script>
@@ -32,6 +31,9 @@ export default {
     getPicture(name) {
       // Find pokemon id and name according to name given in parameters
       const pokemon = this.pokemonIds.find(element => element.name === name);
+      // Return empty string if pokemon is undefined
+      if(!pokemon) return '';
+
       // Format id
       const id = formatId(pokemon.id);
       // Get the picture corresponding to pokemon's id
