@@ -131,7 +131,18 @@ export default {
     this.$store.dispatch('loadSinglePokemon', id);
     this.$store.dispatch('loadAbout', id)    
     next();
-  } 
+  },
+  beforeRouteEnter(to, from, next) {
+    // Check if id in the URL is below 1 or above 807 (pokemon's min and max id)
+    // If yes, redirect to page 404 because pokemon doesn't exist
+    if(to.params.id < '1'|| to.params.id > '807') {
+      next('/notFound')
+    }
+    else {
+      // Else redirect to the wanted url
+      next()
+    }
+  }
 };
 </script>
 
@@ -221,6 +232,7 @@ export default {
 
 .pokemon-img {
   width: 150px;
+  margin-top: 2rem;
 }
 
 @media screen and (min-width: 768px) {

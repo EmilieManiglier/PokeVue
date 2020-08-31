@@ -1,17 +1,18 @@
 <template>
-  <b-card
-    :title="pokemonTitle"
-    :img-src="`https://assets.pokemon.com/assets/cms2/img/pokedex/full/${pokemonId}.png`"
-    :img-alt="pokemon.name"
-    tag="article"
-    class="p-2 m-2 text-center rounded"
-    @click="singlePokemon(pokemon.id)"
-  >
-    <img src="@/assets/pokeball.png" alt="" class="pokeball" />
-    <b-card-text  v-for="type in pokemon.types" :key="type.slot" :class="type.type.name">
-      {{type.type.name}}
-    </b-card-text>
-  </b-card>
+  <router-link :to="`/pokemon/${pokemon.id}`" class="pokemon-link">
+    <b-card
+      :title="pokemonTitle"
+      :img-src="`https://assets.pokemon.com/assets/cms2/img/pokedex/full/${pokemonId}.png`"
+      :img-alt="pokemon.name"
+      tag="article"
+      class="p-2 m-2 text-center rounded"
+    >
+      <img src="@/assets/pokeball.png" alt="" class="pokeball" />
+      <b-card-text  v-for="type in pokemon.types" :key="type.slot" :class="type.type.name">
+        {{type.type.name}}
+      </b-card-text>
+    </b-card>
+  </router-link>
 </template>
 
 <script>
@@ -27,18 +28,20 @@ export default {
       return formatId(this.pokemon.id)
     }
   },
-  methods: {
-    singlePokemon(id) {
-      // Send to the pokemon's detail page
-      this.$router.push(`/pokemon/${id}`);
-    }
-  }
 };
 </script>
 
 <style lang='scss' scoped>
 @import '@/assets/styles/mixin';
 @import '@/assets/styles/types';
+
+  .pokemon-link {
+    color: #2c3e50;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
 
   .card {
     @include linear-gradient(to bottom right, #ff9a9e, #c00d0d);
