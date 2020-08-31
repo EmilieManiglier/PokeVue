@@ -116,7 +116,7 @@ export default new Vuex.Store({
       // hide loader
       commit('mutate', {property: 'loading', value: false});
     },
-    async loadSinglePokemon({ commit, getters }, pokemon) {
+    async loadSinglePokemon({ commit, getters, dispatch }, pokemon) {
       // Reset loading and error value
       commit('mutate', {property: 'loading', value: true});
       commit('mutate', {property: 'error', value: false});
@@ -145,6 +145,9 @@ export default new Vuex.Store({
         // Get pokemon's base stat and update state with the datas
         const stats = response.data.stats.map(stat => stat.base_stat);
         commit('mutate', {property: 'stats', value: stats});
+
+        // Send request to get pokemon about data
+        dispatch('loadAbout', response.data.id);
       }
       catch {
         // Set error to true to display error message

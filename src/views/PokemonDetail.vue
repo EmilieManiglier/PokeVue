@@ -122,14 +122,12 @@ export default {
   },
   created() {
     this.$store.dispatch('loadSinglePokemon', this.id);
-    this.$store.dispatch('loadAbout', this.id)
   },
   // We use beforeRouteUpdate to track every changes in the url
   // If there are changes, update view with the new datas
   beforeRouteUpdate(to, from, next) {
     const id = this.updateParams(this.params);
     this.$store.dispatch('loadSinglePokemon', id);
-    this.$store.dispatch('loadAbout', id)    
     next();
   },
   beforeRouteEnter(to, from, next) {

@@ -135,7 +135,7 @@ export default {
 @media screen and (min-width: 768px) {
   .about .about-datas {
     .data-container {
-      width: 50%;
+      width: 60%;
       margin: 1rem auto;
     }
 
