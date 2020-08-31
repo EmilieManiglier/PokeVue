@@ -5,7 +5,7 @@
       :img-src="`https://assets.pokemon.com/assets/cms2/img/pokedex/full/${pokemonId}.png`"
       :img-alt="pokemon.name"
       tag="article"
-      class="p-2 m-2 text-center rounded"
+      class="p-2 m-2 text-center rounded h-100"
     >
       <img src="@/assets/pokeball.png" alt="" class="pokeball" />
       <b-card-text  v-for="type in pokemon.types" :key="type.slot" :class="type.type.name">
@@ -37,6 +37,8 @@ export default {
 
   .pokemon-link {
     color: #2c3e50;
+    display: block;
+    margin: 0.5rem;
 
     &:hover {
       text-decoration: none;
