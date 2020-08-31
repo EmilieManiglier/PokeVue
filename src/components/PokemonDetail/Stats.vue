@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <stats-chart :chartdata="chartData" :options="chartOptions" />
-  </div>
+  <stats-chart :chartdata="chartData" :options="chartOptions" />
 </template>
 
 <script>

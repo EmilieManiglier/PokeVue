@@ -2,16 +2,14 @@
   <div class="evolution">
     <h3 class="evolution-title">Evolution chain</h3>
 
-    <div v-if="loading">
-      <loader />
-    </div>
+    <loader v-if="loading" />
 
-    <div v-else>
+    <fragment v-else>
       <div v-if="evolutions.evolves_to && evolutions.evolves_to.length === 0">
         {{name}} has no evolution 
       </div>
 
-      <div v-else>
+      <fragment v-else>
         <!-- First(s) Evolution(s) -->
         <div v-for="evolution in evolutions.evolves_to" :key="evolution.species.name">
           <single-evolution
@@ -20,30 +18,31 @@
           />
 
           <!-- Second(s) Evolution(s) -->
-          <div v-if="evolution.evolves_to.length > 0">
+          <fragment v-if="evolution.evolves_to.length > 0">
             <div v-for="nextEvolution in evolution.evolves_to" :key="nextEvolution.species.name">
               <single-evolution
                 :firstEvolutionName="evolution.species.name"
                 :secondEvolutionName="nextEvolution.species.name"
               />
             </div>
-          </div>
+          </fragment>
         </div>
-      </div>
+      </fragment>
 
-    </div>
+    </fragment>
   </div>
 </template>
 
 <script>
-import SingleEvolution from './SingleEvolution';
-import Loader from '@/components/Loader';
 import { mapState } from 'vuex'
+import { Fragment } from 'vue-fragment'
+import Loader from '@/components/Loader';
+import SingleEvolution from './SingleEvolution';
 
 export default {
   name: 'Evolution',
   props: ['name'],
-  components: { SingleEvolution, Loader },
+  components: { Fragment, SingleEvolution, Loader },
   computed: mapState(['evolutions', 'evolutionUrl', 'loading'])
 };
 </script>

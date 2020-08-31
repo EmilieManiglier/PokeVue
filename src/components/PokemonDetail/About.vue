@@ -4,12 +4,12 @@
     <div class="about-datas">
       <h3 class="about-datas__title">Pokédex Data</h3>
       
-      <div v-for="(value, name) in about" :key="name">
+      <fragment v-for="(value, name) in about" :key="name">
         <div class="data-container">
           <span class="data-name">{{ name }}</span>
           {{ value }}
         </div>
-      </div>
+      </fragment>
 
       <div class="data-container">
         <span class="data-name">Abilities</span>
@@ -28,7 +28,7 @@
           </div>
         </div>
 
-        <div v-else>None</div>
+        <fragment v-else>None</fragment>
       </div>
       
     </div>
@@ -47,9 +47,12 @@
 
 <script>
 import { mapState } from 'vuex';
+import { Fragment } from 'vue-fragment'
+
 
 export default {
   props: ['id'],
+  components: { Fragment },
   computed: {
     ...mapState(['description', 'about', 'abilities', 'training']),
     trueAbilities() {
